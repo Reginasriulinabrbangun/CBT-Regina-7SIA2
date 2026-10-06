@@ -19,12 +19,21 @@ class UserInfolist
                     ->columns(2)
                     ->schema([
 
-                        ImageEntry::make('user_avatar')
-                            ->state(fn($record) => $record->getFilamentAvatarUrl())
+                        ImageEntry::make('user_avatar_url')
+                            ->state(fn ($record) => $record->getFilamentAvatarUrl())
+                            ->defaultImageUrl(fn ($record) => $record?->getFilamentAvatarUrl())
+                            ->placeholder('-')
                             ->hiddenLabel()
                             ->alignCenter()
                             ->columnSpanFull()
                             ->circular(),
+
+                        TextEntry::make('initials_fallback')
+                            ->label('')
+                            ->state(fn ($record) => app(\App\Filament\AvatarProviders\LocalInitialsAvatarProvider::class)->initialsFor($record))
+                            ->badge()
+                            ->alignCenter()
+                            ->columnSpanFull(),
 
                         TextEntry::make('name'),
 

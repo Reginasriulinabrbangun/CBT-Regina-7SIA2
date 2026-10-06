@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -26,8 +27,12 @@ class UsersTable
                 TextColumn::make('email_verified_at')
                     ->dateTime()
                     ->sortable(),
-                TextColumn::make('photo_path')
-                    ->searchable(),
+                ImageColumn::make('user_avatar_url')
+                    ->label('Avatar')
+                    ->circular()
+                    ->size(40)
+                    ->state(fn ($record) => $record->getFilamentAvatarUrl())
+                    ->defaultImageUrl(fn ($record) => $record?->getFilamentAvatarUrl()),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

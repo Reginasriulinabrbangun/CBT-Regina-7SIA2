@@ -20,7 +20,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
     // ubah teks pada navigasi
     protected static ?string $navigationLabel = 'Akun Pegawai';

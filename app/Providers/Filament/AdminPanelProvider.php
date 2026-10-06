@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\AvatarProviders\LocalInitialsAvatarProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -26,7 +27,8 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->login() 
+            ->login()
+            ->defaultAvatarProvider(LocalInitialsAvatarProvider::class)
             ->colors([
                 'primary' => Color::Amber,
             ])

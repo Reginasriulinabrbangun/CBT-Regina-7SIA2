@@ -23,13 +23,16 @@ class UserForm
                         FileUpload::make('photo_path')
                             ->label('Foto profil')
                             ->hiddenLabel()
+                            ->helperText('Kosong = inisial nama otomatis')
                             ->avatar()
                             ->image()
                             ->alignCenter()
                             ->columnSpanFull()
                             ->disk('public')
                             ->directory('avatar')
-                            ->imageEditor(),
+                            ->imageEditor()
+                            ->deletable()
+                            ->openable(),
 
                         TextInput::make('name')
                             ->required()
