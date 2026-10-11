@@ -10,13 +10,15 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Orchid\Platform\Models\User as OrchidUser;
 
-#[Fillable(['name', 'email', 'nisn', 'password', 'photo_path', 'avatar_url', 'is_staff'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements FilamentUser, HasAvatar
+#[Fillable(['name', 'email', 'nisn', 'password', 'photo_path', 'avatar_url', 'is_staff', 'permissions'])]
+#[Hidden(['password', 'remember_token', 'permissions'])]
+class User extends OrchidUser implements FilamentUser, HasAvatar
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -36,6 +38,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     protected function casts(): array
     {
         return [
+            'permissions' => 'array',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_staff' => 'boolean',
@@ -45,6 +48,24 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->is_staff;
+    }
+
+    /**
+     * Siswa (non-staff) hanya boleh membuka permission portal siswa.
+     * Screen bawaan Orchid (platform.*) tetap 403 untuk mereka.
+     */
+    public function hasAccess(string $permit, bool $cache = true): bool
+    {
+        if (! $this->is_staff && Str::startsWith($permit, 'siswa.')) {
+            return true;
+        }
+
+        return parent::hasAccess($permit, $cache);
+    }
+
+    public function siswa(): HasOne
+    {
+        return $this->hasOne(Siswa::class);
     }
 
     /**

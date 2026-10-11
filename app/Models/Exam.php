@@ -9,10 +9,10 @@ class Exam extends Model
 {
     protected $guarded = [];
 
-    protected $cast = [
-        'conducted_at' => 'datetime',
-        'exact_time' => 'boolean',
+    protected $casts = [
+        'conduct_at' => 'datetime',
         'expired_at' => 'datetime',
+        'exact_time' => 'boolean',
         'min_score' => 'decimal:2',
     ];
 

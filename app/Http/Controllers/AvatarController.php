@@ -18,8 +18,19 @@ class AvatarController extends Controller
      */
     public function show(User $user): Response
     {
-        if ($user->photo_path && Storage::disk('public')->exists($user->photo_path)) {
-            return redirect(Storage::disk('public')->url($user->photo_path));
+        // Foto user (pegawai), atau fallback ke foto siswa miliknya.
+        $path = $user->photo_path ?: $user->siswa?->resolvedFotoPath();
+
+        if ($path && Storage::disk('public')->exists($path)) {
+            return redirect(Storage::disk('public')->url($path));
+        }
+
+        // Siswa tanpa foto memakai ilustrasi avatar default, bukan inisial teks.
+        if (! $user->is_staff) {
+            return response()->file(
+                public_path('images/avatar/student-default.svg'),
+                ['Content-Type' => 'image/svg+xml', 'Cache-Control' => 'public, max-age=86400']
+            );
         }
 
         return $this->svgResponse(InitialsAvatar::displayNameFor($user));
