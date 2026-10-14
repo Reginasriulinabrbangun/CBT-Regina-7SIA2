@@ -297,10 +297,6 @@ body {
     margin-top: auto !important;
 }
 
-.siswa-aside .to-top {
-    display: none !important;
-}
-
 /* --- Topbar: pencarian, notifikasi, profil --- */
 .siswa-topbar {
     padding-bottom: 0.25rem;
@@ -364,7 +360,8 @@ body {
 }
 
 .siswa-hero__art {
-    width: 8rem;
+    /* Lebar mengikuti ruang banner agar teks tidak terhimpit di layar sempit. */
+    width: clamp(4.5rem, 30%, 8rem);
     max-height: 6.5rem;
     object-fit: contain;
 }
@@ -600,4 +597,338 @@ body.page-siswa-dashboard .workspace > .text-center.user-select-none {
 [data-bs-theme='dark'] .stat-card--orange .stat-card__badge {
     color: #fdba74;
     background: #7c2d12;
+}
+
+/* ============================================================
+ * Sidebar collapsible + responsif mobile
+ * ============================================================ */
+
+/* --- Tombol toggle collapse (desktop) --- */
+.siswa-rail-toggle {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 0.5rem;
+    color: rgb(255 255 255 / 70%);
+    text-decoration: none;
+}
+
+.siswa-rail-toggle:hover,
+.siswa-rail-toggle:focus {
+    color: #fff;
+    background-color: rgb(255 255 255 / 10%);
+}
+
+/* Ikon di dalam tombol selalu presisi di tengah. */
+.siswa-rail-toggle__icon {
+    display: block;
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+/* --- Backdrop drawer mobile --- */
+.siswa-backdrop {
+    position: fixed;
+    inset: 3.5rem 0 0 0;
+    width: auto;
+    z-index: 1042;
+    background: rgb(15 23 42 / 55%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+body.menu-open .siswa-backdrop {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* ============================================================
+ * Desktop (>=992px): sidebar bisa diciutkan jadi rail ikon
+ * ============================================================ */
+@media (min-width: 992px) {
+    .siswa-aside {
+        transition: width 0.2s ease, max-width 0.2s ease;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-aside {
+        width: 72px;
+        min-width: 72px;
+        max-width: 72px;
+        /* Buang gutter kolom Bootstrap supaya seluruh 72px bisa dipakai isi rail. */
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Kolom konten mengisi sisa lebar.
+       `flex-basis: 0` (bukan `auto`) — kalau `auto`, lebar dasar mengikuti konten
+       sehingga baris meluber dan `justify-content: center` menggeser rail menimpa konten.
+       `~` (general sibling) dipakai karena backdrop drawer ada di antara keduanya. */
+    html[data-siswa-sidebar='collapsed'] .siswa-aside ~ .col-xxl {
+        flex: 1 1 0;
+        min-width: 0;
+        max-width: none;
+    }
+
+    /* Judul seksi menu (mis. "Portal Siswa") tidak muat di rail. */
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-pills > .nav-item > small {
+        display: none !important;
+    }
+
+    /* Sembunyikan teks, sisakan ikon.
+       `!important` diperlukan untuk melawan utility Bootstrap seperti `d-lg-block`. */
+    html[data-siswa-sidebar='collapsed'] .siswa-brand__name,
+    html[data-siswa-sidebar='collapsed'] .siswa-brand__tagline,
+    html[data-siswa-sidebar='collapsed'] .user-card__name,
+    html[data-siswa-sidebar='collapsed'] .user-card__meta,
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link .text-break,
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link .badge {
+        display: none !important;
+    }
+
+    /* Elemen pembungkus label tetap jadi flex item walau isinya disembunyikan,
+       sehingga `gap` masih menyisakan ruang dan ikon/avatar jadi tidak di tengah.
+       Nolkan gap agar ikon benar-benar presisi di tengah. */
+    html[data-siswa-sidebar='collapsed'] .siswa-brand {
+        gap: 0;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .user-card,
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link {
+        gap: 0 !important;
+    }
+
+    /* Logo dan tombol toggle ditumpuk vertikal agar keduanya muat di lebar 72px. */
+    html[data-siswa-sidebar='collapsed'] .siswa-aside header {
+        flex-direction: column;
+        gap: 0.375rem;
+        padding: 0.75rem 0.25rem;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-brand,
+    html[data-siswa-sidebar='collapsed'] .user-card,
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link {
+        justify-content: center;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link {
+        padding: 0.625rem 0.5rem;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .user-card {
+        margin-left: 0.5rem !important;
+        margin-right: 0.5rem !important;
+        padding: 0.5rem 0.25rem;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .divider {
+        margin-left: 0.75rem;
+        margin-right: 0.75rem;
+    }
+
+    /* Tooltip nama menu saat hover/focus (label diisi oleh JS). */
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link {
+        position: relative;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link::after {
+        content: attr(data-label);
+        position: absolute;
+        top: 50%;
+        left: calc(100% + 0.5rem);
+        transform: translateY(-50%);
+        padding: 0.35rem 0.6rem;
+        border-radius: 0.5rem;
+        background: #0f172a;
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.12s ease;
+        z-index: 1060;
+    }
+
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link:hover::after,
+    html[data-siswa-sidebar='collapsed'] .siswa-aside .nav-link:focus-visible::after {
+        opacity: 1;
+    }
+
+    .siswa-aside .nav-link:focus-visible {
+        outline: 2px solid #93c5fd;
+        outline-offset: 2px;
+    }
+}
+
+/* ============================================================
+ * Mobile (<992px): bar ringkas + drawer menu meluncur
+ * ============================================================ */
+@media (max-width: 991.98px) {
+    /* Header sidebar tetap tampil sebagai bar ringkas. */
+    .siswa-aside {
+        position: sticky;
+        top: 0;
+        z-index: 1040;
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: 100%;
+        height: 3.5rem;
+    }
+
+    /* Profil siswa sudah ada di topbar. */
+    .siswa-aside .user-card {
+        display: none;
+    }
+
+    /* Sapaan sudah tampil sebagai judul hero — cukup ikon di bar ringkas. */
+    .siswa-aside .header-toggler > span {
+        display: none;
+    }
+
+    /* Panel menu menjadi drawer overlay dari kiri.
+       `!important` untuk melawan utility `w-100` pada nav bawaan Orchid. */
+    .siswa-aside .aside-collapse {
+        position: fixed;
+        top: 3.5rem;
+        left: 0;
+        bottom: 0;
+        width: min(300px, 85vw) !important;
+        height: auto;
+        padding: 1rem;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%);
+        z-index: 1045;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease, visibility 0.25s ease !important;
+    }
+
+    body.menu-open .aside-collapse {
+        transform: translateX(0);
+    }
+
+    /* Batalkan perilaku bawaan Orchid: aside tidak memanjang, konten tetap terlihat. */
+    body.menu-open .siswa-aside {
+        height: 3.5rem !important;
+        min-height: 0 !important;
+    }
+
+    body.menu-open .workspace {
+        display: flex !important;
+    }
+
+    /* Kunci scroll latar selama drawer terbuka. */
+    body.menu-open {
+        overflow: hidden;
+    }
+}
+
+/* ============================================================
+ * Perbaikan responsif dashboard
+ * ============================================================ */
+
+/* Orchid membungkus konten dengan `container-xl p-0` → nol padding horizontal. */
+.container-xl.p-0 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+@media (min-width: 768px) {
+    .container-xl.p-0 {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+}
+
+/* Judul hero menyesuaikan lebar layar. */
+.siswa-hero__title {
+    font-size: clamp(1.35rem, 1rem + 2.2vw, 1.75rem);
+}
+
+/* Titik legenda (menggantikan inline style). */
+.siswa-legend__dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+}
+
+@media (max-width: 575.98px) {
+    .siswa-hero__art {
+        width: 5.5rem;
+        max-height: 4.5rem;
+    }
+
+    .siswa-hero__banner {
+        gap: 0.75rem !important;
+    }
+
+    .siswa-topbar {
+        gap: 0.5rem !important;
+    }
+
+    .siswa-search {
+        max-width: none;
+    }
+
+    .stat-card .card-body {
+        padding: 0.875rem;
+    }
+
+    .stat-card__value {
+        font-size: 1.25rem;
+    }
+
+    .stat-card__badge {
+        display: none;
+    }
+
+    /* Tabel riwayat: beri lebar minimum agar nama mapel tidak terpotong
+       di tengah kata; .table-responsive menanganinya dengan geser horizontal. */
+    body.page-siswa-dashboard .table-responsive > .table {
+        min-width: 24rem;
+    }
+
+    body.page-siswa-dashboard .table-responsive > .table td:first-child {
+        white-space: nowrap;
+    }
+
+    body.page-siswa-dashboard .table-responsive > .table th,
+    body.page-siswa-dashboard .table-responsive > .table td {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .siswa-calendar__cell {
+        min-height: 1.75rem;
+        padding: 0.2rem 0;
+        font-size: 0.72rem;
+    }
+
+    .siswa-calendar__grid {
+        gap: 1px;
+    }
+
+    .siswa-calendar__dow {
+        font-size: 0.6rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .siswa-aside,
+    .siswa-aside .aside-collapse,
+    .siswa-aside .nav-link::after,
+    .siswa-backdrop {
+        transition: none !important;
+    }
 }

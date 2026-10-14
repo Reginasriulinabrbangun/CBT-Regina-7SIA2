@@ -22,7 +22,33 @@ class PlatformProvider extends OrchidServiceProvider
     {
         parent::boot($dashboard);
 
-        // ...
+        // Aset statis di /public (css & js tema) tidak dikirim dengan header cache oleh
+        // `artisan serve`, sehingga browser memakai cache heuristik dan bisa terus memakai
+        // versi lama. Tambahkan query versi dari mtime agar setiap perubahan langsung dipakai.
+        $resources = config('platform.resource', []);
+
+        foreach (['stylesheets', 'scripts'] as $type) {
+            $resources[$type] = array_map(
+                fn ($path) => $this->versionedAsset((string) $path),
+                $resources[$type] ?? []
+            );
+        }
+
+        config(['platform.resource' => $resources]);
+    }
+
+    /**
+     * Tambahkan query `?v=<mtime>` pada aset lokal (URL eksternal dibiarkan apa adanya).
+     */
+    protected function versionedAsset(string $path): string
+    {
+        if (! str_starts_with($path, '/')) {
+            return $path;
+        }
+
+        $file = public_path(ltrim((string) strtok($path, '?'), '/'));
+
+        return is_file($file) ? $path.'?v='.filemtime($file) : $path;
     }
 
     /**

@@ -3,14 +3,20 @@
     @fonts
 
     <script>
-        // Terapkan tema tersimpan sebelum render (anti-flicker). Default: light.
+        // Terapkan tema & status sidebar tersimpan sebelum render (anti-flicker).
+        // Disimpan di <html> agar bertahan lintas navigasi Turbo (body diganti Turbo).
         try {
             document.documentElement.setAttribute(
                 'data-bs-theme',
                 localStorage.getItem('siswa-bs-theme') === 'dark' ? 'dark' : 'light'
             );
+            document.documentElement.setAttribute(
+                'data-siswa-sidebar',
+                localStorage.getItem('siswa-sidebar') === 'collapsed' ? 'collapsed' : 'expanded'
+            );
         } catch (e) {
             document.documentElement.setAttribute('data-bs-theme', 'light');
+            document.documentElement.setAttribute('data-siswa-sidebar', 'expanded');
         }
     </script>
 @endpush

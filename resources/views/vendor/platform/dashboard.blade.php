@@ -9,42 +9,50 @@
 @extends(config('platform.workspace', 'platform::workspace.compact'))
 
 @section('aside')
-    <div class="aside siswa-aside col-xs-12 col-lg-3 col-xl-2 bg-dark d-flex flex-column" data-controller="menu" data-bs-theme="dark">
+    <div class="aside siswa-aside col-12 col-lg-3 col-xl-2 bg-dark d-flex flex-column" data-controller="menu" data-bs-theme="dark">
         <header class="p-3 mt-lg-4 w-100 d-flex align-items-center">
-            <a href="#" class="header-toggler d-lg-none me-auto order-first d-flex align-items-center lh-1 link-body-emphasis"
-               data-action="click->menu#toggle">
+            {{-- Mobile: hamburger membuka drawer menu --}}
+            <a href="#" id="siswaMenuToggle"
+               class="header-toggler d-lg-none me-auto d-flex align-items-center lh-1 link-body-emphasis"
+               data-action="click->menu#toggle"
+               aria-controls="headerMenuCollapse" aria-expanded="false"
+               aria-label="{{ __('Buka menu') }}">
                 <x-orchid-icon path="bs.three-dots-vertical" class="icon-menu"/>
 
                 <span class="ms-2">@yield('title')</span>
             </a>
 
-            <a class="header-brand order-last link-body-emphasis" href="{{ route(config('platform.index')) }}">
+            <a class="header-brand link-body-emphasis me-lg-auto" href="{{ route(config('platform.index')) }}">
                 @includeFirst([config('platform.template.header'), 'platform::header'])
             </a>
+
+            {{-- Desktop: ciutkan sidebar menjadi rail ikon --}}
+            <button type="button" id="siswaSidebarToggle"
+                    class="siswa-rail-toggle d-none d-lg-inline-flex btn btn-sm btn-link link-body-emphasis align-items-center justify-content-center p-0"
+                    aria-controls="headerMenuCollapse" aria-expanded="true"
+                    aria-label="{{ __('Perkecil sidebar') }}">
+                {{-- Ikon panel: Lucide "panel-right" (ISC) - https://lucide.dev - diunduh 2026-10-12 --}}
+                <svg class="siswa-rail-toggle__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                     width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/>
+                    <path d="M15 3v18"/>
+                </svg>
+            </button>
         </header>
 
         @includeWhen(Auth::check(), 'siswa.partials.user-card')
 
-        <nav class="aside-collapse w-100 d-lg-flex flex-column collapse-horizontal text-body-emphasis" id="headerMenuCollapse">
+        <nav class="aside-collapse w-100 d-lg-flex flex-column collapse-horizontal text-body-emphasis" id="headerMenuCollapse" tabindex="-1">
 
             <ul class="nav nav-pills flex-column mb-md-1 mb-auto ps-0 gap-1">
                 {!! Dashboard::renderMenu() !!}
             </ul>
-
-            <div class="h-100 w-100 position-relative to-top cursor d-none d-md-flex mt-md-5"
-                 data-action="click->html-load#goToTop"
-                 title="{{ __('Scroll to top') }}">
-                <div class="bottom-left w-100 mb-2 ps-3 overflow-hidden">
-                    <small data-controller="viewport-entrance-toggle"
-                           class="scroll-to-top d-flex align-items-center gap-3"
-                           data-viewport-entrance-toggle-class="show">
-                        <x-orchid-icon path="bs.chevron-up"/>
-                        {{ __('Scroll to top') }}
-                    </small>
-                </div>
-            </div>
         </nav>
     </div>
+
+    {{-- Lapisan gelap saat drawer menu mobile terbuka --}}
+    <div id="siswaMenuBackdrop" class="siswa-backdrop" aria-hidden="true" tabindex="-1"></div>
 @endsection
 
 @section('workspace')

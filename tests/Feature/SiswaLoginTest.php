@@ -20,11 +20,11 @@ function buatSiswa(array $overrides = []): User
 it('menampilkan halaman login siswa', function () {
     $this->get(route('siswa.login'))
         ->assertOk()
-        ->assertSee('Masuk ke Akun Siswa', false)
+        ->assertSee('Masuk ke Akun', false)
         ->assertSee('Selamat Datang', false)
         ->assertSee('Masukkan NISN', false)
         ->assertSee('Masukkan kata sandi', false)
-        ->assertSee('images/login-ujian.svg', false)
+        ->assertSee('images/illustrations/ilustrasi-siswa-laptop-4k-tanpa-latar.svg', false)
         ->assertDontSee('Daftar sekarang', false);
 });
 
@@ -283,4 +283,43 @@ it('halaman login memuat font secara lokal, bukan dari CDN eksternal', function 
         ->assertDontSee('fonts.bunny.net', false)
         ->assertDontSee('fonts.googleapis.com', false)
         ->assertDontSee('fonts.gstatic.com', false);
+});
+
+it('sidebar dashboard punya tombol toggle collapse dan backdrop drawer', function () {
+    $this->actingAs(buatSiswa())
+        ->get(route('siswa.dashboard'))
+        ->assertOk()
+        ->assertSee('id="siswaSidebarToggle"', false)
+        ->assertSee('id="siswaMenuToggle"', false)
+        ->assertSee('id="siswaMenuBackdrop"', false)
+        ->assertSee('aria-controls="headerMenuCollapse"', false)
+        ->assertSee('aria-expanded="true"', false);
+});
+
+it('status sidebar disimpan di localStorage dan diterapkan sebelum render', function () {
+    $this->actingAs(buatSiswa())
+        ->get(route('siswa.dashboard'))
+        ->assertOk()
+        // Inline script anti-FOUC menyetel atribut di <html> dari localStorage.
+        ->assertSee('siswa-sidebar', false)
+        ->assertSee('data-siswa-sidebar', false);
+});
+
+it('CSS sidebar menyediakan rail desktop dan drawer mobile', function () {
+    $css = file_get_contents(public_path('css/siswa-theme.css'));
+
+    expect($css)->toContain("html[data-siswa-sidebar='collapsed']")
+        ->toContain('.siswa-backdrop')
+        ->toContain('body.menu-open .workspace')
+        // Perbaikan padding nol dari `container-xl p-0` bawaan Orchid.
+        ->toContain('.container-xl.p-0');
+});
+
+it('JS portal menangani toggle sidebar, tooltip, dan navigasi Turbo', function () {
+    $js = file_get_contents(public_path('js/siswa-theme.js'));
+
+    expect($js)->toContain('siswa-sidebar')
+        ->toContain('data-label')
+        ->toContain('turbo:load')
+        ->toContain('siswaMenuBackdrop');
 });

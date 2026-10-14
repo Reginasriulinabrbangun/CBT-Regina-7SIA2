@@ -1,14 +1,12 @@
-{{-- Portal siswa: hero, statistik, ujian berikutnya, riwayat, kalender. Desain mengikuti mockup CERDAS CBT. --}}
-
 {{-- Hero: sapaan + banner ajakan --}}
 <div class="row g-3 mb-3">
-    <div class="col-lg-8">
+    <div class="col-xl-8">
         <div class="siswa-hero h-100 d-flex flex-column justify-content-center">
-            <h1 class="siswa-hero__title mb-1">Halo, {{ $namaDepan }}! </h1>
+            <h1 class="siswa-hero__title mb-1 text-white">Halo, {{ $namaDepan }}! </h1>
             <p class="siswa-hero__subtitle mb-0">Siap meraih hasil terbaik hari ini?</p>
         </div>
     </div>
-    <div class="col-lg-4">
+    <div class="col-xl-4">
         <div class="siswa-hero__banner h-100 d-flex align-items-center gap-3">
             <img src="{{ asset('images/illustrations/hero-belajar.svg') }}" alt="" class="siswa-hero__art flex-shrink-0"
                 loading="lazy">
@@ -204,11 +202,9 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="d-flex gap-3 border-top mt-2 pt-2 small text-muted">
-                    <span><span class="d-inline-block rounded-circle bg-primary me-1"
-                            style="width:.5rem;height:.5rem;"></span> Hari Ujian</span>
-                    <span><span class="d-inline-block rounded-circle bg-success me-1"
-                            style="width:.5rem;height:.5rem;"></span> Sudah Dikerjakan</span>
+                <div class="d-flex flex-wrap gap-3 border-top mt-2 pt-2 small text-muted">
+                    <span><span class="siswa-legend__dot bg-primary me-1"></span> Hari Ujian</span>
+                    <span><span class="siswa-legend__dot bg-success me-1"></span> Sudah Dikerjakan</span>
                 </div>
             </div>
         </div>
